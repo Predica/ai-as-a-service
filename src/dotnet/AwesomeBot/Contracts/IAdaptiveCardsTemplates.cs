@@ -1,7 +1,12 @@
+using System.Collections.Generic;
+using AwesomeBot.Models;
+using Microsoft.Bot.Schema;
+
 namespace AwesomeBot.Contracts
 {
     public interface IAdaptiveCardsTemplates
     {
-        string EchoCard(string text);
+        IActivity EchoCard(string text);
+        IActivity QnACard(IEnumerable<QnA> questionAndAnswers);
     }
 }

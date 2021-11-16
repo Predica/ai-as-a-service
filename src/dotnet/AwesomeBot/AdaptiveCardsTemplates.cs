@@ -1,7 +1,10 @@
 using System.Collections.Generic;
+using System.Runtime.Intrinsics.X86;
+using AdaptiveCards;
 using AdaptiveCards.Templating;
 using AwesomeBot.Contracts;
 using AwesomeBot.Models;
+using Microsoft.Bot.Builder;
 using Microsoft.Bot.Schema;
 using Newtonsoft.Json;
 
@@ -11,10 +14,18 @@ namespace AwesomeBot
     {
         public IActivity EchoCard(string text)
         {
+            // return CreateCard(new AdaptiveCard(
+            //     new AdaptiveSchemaVersion(1, 3))
+            //     {
+            //         Body = new List<AdaptiveElement>()
+            //         {
+            //             new AdaptiveTextBlock($"echo {text}")
+            //         }
+            //     });
             var templateJson = @"
             {
                 ""type"": ""AdaptiveCard"",
-                ""version"": ""1.4"",
+                ""version"": ""1.3"",
                 ""body"": [
                     {
                         ""type"": ""TextBlock"",
@@ -30,7 +41,7 @@ namespace AwesomeBot
             };
             
             var card =  template.Expand(data);
-
+            
             return CreateCard(card);
         }
 
@@ -39,7 +50,7 @@ namespace AwesomeBot
             var templateJson = @"
             {
                 ""type"": ""AdaptiveCard"",
-                ""version"": ""1.4"",
+                ""version"": ""1.3"",
                 ""body"": [
                     {
                         ""$data"": ""${{answers}}"",
@@ -85,17 +96,25 @@ namespace AwesomeBot
             return CreateCard(card);
         }
 
-        private IActivity CreateCard(string card)
-            => new Activity()
+        private IMessageActivity CreateCard(AdaptiveCard card)
+        {
+            var reply = Activity.CreateMessageActivity();
+            reply.Attachments.Add(new Attachment()
             {
-                Attachments = new[]
-                {
-                    new Attachment()
-                    {
-                        ContentType = "application/vnd.microsoft.card.adaptive",
-                        Content = JsonConvert.DeserializeObject(card),
-                    }
-                }
-            };
+                ContentType = AdaptiveCard.ContentType,
+                Content = card,
+            });
+            return reply;
+        }
+        private IMessageActivity CreateCard(string card)
+        {
+            var reply = Activity.CreateMessageActivity();
+            reply.Attachments.Add(new Attachment()
+            {
+                ContentType = AdaptiveCard.ContentType,
+                Content = JsonConvert.DeserializeObject<AdaptiveCard>(card),
+            });
+            return reply;
+        }
     }
 }

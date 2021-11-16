@@ -26,6 +26,7 @@ namespace AwesomeBot.Services
         public async IAsyncEnumerable<QnA> Ask(ITurnContext turnContext, [EnumeratorCancellation] CancellationToken cancellationToken)
         {
             var qnaResults = await _maker.GetAnswersAsync(turnContext, _makerOptions);
+            if (qnaResults is not { Length: > 0 }) yield break;
             foreach (var queryResult in qnaResults)
             {
                 yield return new QnA(queryResult.Answer, queryResult.Questions.First());

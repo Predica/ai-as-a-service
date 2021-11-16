@@ -53,28 +53,28 @@ namespace AwesomeBot
                 ""version"": ""1.3"",
                 ""body"": [
                     {
-                        ""$data"": ""${{answers}}"",
+                        ""$data"": ""${answers}"",
                         ""type"": ""Container"",
                         ""style"": ""emphasis"",
                         ""items"":[ 
                             {
                                 ""type"": ""ColumnSet"",
                                 ""columns"": [
-                                    {{
+                                    {
                                         ""type"": ""Column"",
                                         ""items"":[ 
                                            {
                                                ""type"": ""TextBlock"",                                       
                                                 ""text"": ""${question}"",
-                                                ""wrap"": true
+                                                ""wrap"": ""true""
                                             },
                                             {
                                                 ""type"": ""TextBlock"",
                                                 ""weight"": ""Bolder"",
                                                 ""spacing"": ""None"",
                                                 ""text"": ""${answer}"",
-                                                ""isSubtle"": false,
-                                                ""wrap"": true
+                                                ""isSubtle"": ""false"",
+                                                ""wrap"": ""true""
                                             }
                                         ]
                                     }

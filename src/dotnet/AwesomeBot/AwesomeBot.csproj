@@ -10,6 +10,8 @@
     <PackageReference Include="AdaptiveCards" Version="2.7.2" />
     <PackageReference Include="AdaptiveCards.Templating" Version="1.2.2" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.1.1" />
+    <PackageReference Include="Microsoft.Bot.Builder.AI.Luis" Version="4.14.1" />
+    <PackageReference Include="Microsoft.Bot.Builder.AI.QnA" Version="4.14.1" />
     <PackageReference Include="Microsoft.Bot.Builder.Integration.AspNet.Core" Version="4.14.1" />
   </ItemGroup>
 

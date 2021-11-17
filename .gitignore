@@ -351,3 +351,4 @@ MigrationBackup/
 .idea/
 venv/
 appsettings.Development.json
+.DS_Store

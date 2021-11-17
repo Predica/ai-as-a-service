@@ -16,3 +16,10 @@
 - [Azure Portal](https://portal.azure.com)
 - [Language Understanding using LUIS](https://docs.microsoft.com/en-us/azure/cognitive-services/luis/)
 - [Channels and Bot Connector Service](https://docs.microsoft.com/en-us/azure/bot-service/bot-concepts?view=azure-bot-service-4.0)
+- [QnA Maker](https://docs.microsoft.com/en-us/azure/cognitive-services/qnamaker/)
+- [Language Portal](https://language.azure.com/home)
+- [Custom Translation Portal](https://portal.customtranslator.azure.ai/)
+- [Vision Portal](https://preview.vision.azure.com/gallery)
+- [Speech Portal](https://speech.microsoft.com/portal)
+- [Lip sync using cognitive servicse](https://www.linkedin.com/pulse/azure-lip-sync-3d-model-animation-curtesy-amazon-peter-laker/)
+

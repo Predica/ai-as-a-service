@@ -14,7 +14,6 @@ namespace AwesomeBot
         private readonly IAdaptiveCardsTemplates _templates;
         private readonly IContextOrchestrator _contextOrchestrator;
         private readonly IQnAService _qnAService;
-
         public Bot(IAdaptiveCardsTemplates templates, IContextOrchestrator contextOrchestrator, IQnAService qnAService)
         {
             _templates = templates;
@@ -26,7 +25,8 @@ namespace AwesomeBot
             var context = await _contextOrchestrator.Decide(turnContext, cancellationToken);
             var activity = context switch
             {
-                BotContext.Echo => _templates.EchoCard(turnContext.Activity.Text),
+                BotContext.Echo => _templates.EchoCard(
+                    turnContext.Activity.Text),
                 BotContext.QnA => _templates.QnACard(
                     await _qnAService.Ask(turnContext, cancellationToken).ToEnumerableAsync(cancellationToken)
                     ),

@@ -2,35 +2,47 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
-using System.Threading.Tasks;
 using AwesomeBot.Contracts;
 using AwesomeBot.Models;
+using Azure.AI.Language.QuestionAnswering;
 using Microsoft.Bot.Builder;
-using Microsoft.Bot.Builder.AI.QnA;
 
 namespace AwesomeBot.Services
 {
     public class QnAService : IQnAService
     {
-        private readonly QnAMaker _maker;
-        private readonly QnAMakerOptions _makerOptions = new()
+        private readonly QuestionAnsweringClient _maker;
+        private readonly QuestionAnsweringProject _project;
+        private readonly ITranslationService _translationService;
+
+        private readonly AnswersOptions _makerOptions = new()
         {
-            Top = 2,
-            ScoreThreshold = 0.5f
+            Size = 2,
+            ConfidenceThreshold = 0.5f
         };
 
-        public QnAService(QnAMaker maker)
+        public QnAService(QuestionAnsweringClient maker, QuestionAnsweringProject project, ITranslationService translationService)
         {
             _maker = maker;
+            _project = project;
+            _translationService = translationService;
         }
 
         public async IAsyncEnumerable<QnA> Ask(ITurnContext turnContext, [EnumeratorCancellation] CancellationToken cancellationToken)
         {
-            var qnaResults = await _maker.GetAnswersAsync(turnContext, _makerOptions);
-            if (qnaResults is not { Length: > 0 }) yield break;
-            foreach (var queryResult in qnaResults)
+            var lang = await _translationService.Detect(turnContext, cancellationToken);
+            var text = turnContext.Activity.Text;
+            if ((lang & Language.Polish) != 0)
             {
-                yield return new QnA(queryResult.Answer, queryResult.Questions.First());
+                text = await _translationService.Translate(text, lang, cancellationToken);
+            }
+            var qnaResults = await _maker.GetAnswersAsync(text, _project,_makerOptions, cancellationToken);
+            if (qnaResults is not { Value.Answers.Count: > 0 }) yield break;
+            foreach (var queryResult in qnaResults.Value.Answers)
+            {
+                var answer = await _translationService.Translate(queryResult.Answer, Language.English, cancellationToken);
+                var question =  await _translationService.Translate(queryResult.Questions.First(), Language.English, cancellationToken);
+                yield return new QnA(answer, question);
             }
         }
     }

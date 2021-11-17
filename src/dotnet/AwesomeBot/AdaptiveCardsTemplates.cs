@@ -65,14 +65,14 @@ namespace AwesomeBot
                                         ""items"":[ 
                                            {
                                                ""type"": ""TextBlock"",                                       
-                                                ""text"": ""${question}"",
+                                                ""text"": ""PYT: ${answer}"",
                                                 ""wrap"": ""true""
                                             },
                                             {
                                                 ""type"": ""TextBlock"",
                                                 ""weight"": ""Bolder"",
                                                 ""spacing"": ""None"",
-                                                ""text"": ""${answer}"",
+                                                ""text"": ""ODP: ${question}"",
                                                 ""isSubtle"": ""false"",
                                                 ""wrap"": ""true""
                                             }
@@ -106,15 +106,7 @@ namespace AwesomeBot
             });
             return reply;
         }
-        private IMessageActivity CreateCard(string card)
-        {
-            var reply = Activity.CreateMessageActivity();
-            reply.Attachments.Add(new Attachment()
-            {
-                ContentType = AdaptiveCard.ContentType,
-                Content = JsonConvert.DeserializeObject<AdaptiveCard>(card),
-            });
-            return reply;
-        }
+        private IMessageActivity CreateCard(string card) 
+            => CreateCard(JsonConvert.DeserializeObject<AdaptiveCard>(card));
     }
 }

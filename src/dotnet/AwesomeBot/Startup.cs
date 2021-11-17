@@ -3,9 +3,13 @@
 //
 // Generated with EmptyBot .NET Template version v4.14.1.2
 
+using System;
 using AwesomeBot.Contracts;
 using AwesomeBot.Models;
 using AwesomeBot.Services;
+using Azure;
+using Azure.AI.Language.QuestionAnswering;
+using Azure.AI.TextAnalytics;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Bot.Builder;
@@ -40,22 +44,31 @@ namespace AwesomeBot
             services.AddScoped<IQnAService, QnAService>();
             // Create the bot as a transient. In this case the ASP Controller is expecting an IBot.
             services.AddTransient<IBot, Bot>();
-            services.AddOptions<QnAMakerOption>().Configure<IConfiguration>(
-                (options, configuration) => configuration.GetSection("QnAMaker").Bind(options));
+            services.AddOptions<LanguageOption>().Configure<IConfiguration>(
+                (options, configuration) => configuration.GetSection("Language").Bind(options));
             services.AddOptions<LuisOption>().Configure<IConfiguration>(
                 (options, configuration) => configuration.GetSection("Luis").Bind(options));
+
+            services.AddScoped(serviceProvider =>
+            {
+                var option = serviceProvider.GetService<IOptions<LanguageOption>>()?.Value ??
+                             throw new OptionsValidationException(nameof(LanguageOption), typeof(LanguageOption),
+                                 new[] { "option doesn't exist" });
+                return new QuestionAnsweringProject(option.Project, option.Deployment);
+            });
             
             services.AddScoped(serviceProvider =>
             {
-                var option = serviceProvider.GetService<IOptions<QnAMakerOption>>()?.Value ??
-                             throw new OptionsValidationException(nameof(QnAMakerOption), typeof(QnAMakerOption), new []{"option doesn't exist"});
-                return new QnAMaker(
-                    new QnAMakerEndpoint
-                    {
-                        KnowledgeBaseId = option.KnowledgeBaseId,
-                        Host = option.Host,
-                        EndpointKey = option.EndpointKey
-                    });
+                var option = serviceProvider.GetService<IOptions<LanguageOption>>()?.Value ??
+                             throw new OptionsValidationException(nameof(LanguageOption), typeof(LanguageOption), new []{"option doesn't exist"});
+                return new QuestionAnsweringClient(new Uri(option.Host), new AzureKeyCredential(option.EndpointKey));
+            });
+            
+            services.AddScoped(serviceProvider =>
+            {
+                var option = serviceProvider.GetService<IOptions<LanguageOption>>()?.Value ??
+                             throw new OptionsValidationException(nameof(LanguageOption), typeof(LanguageOption), new []{"option doesn't exist"});
+                return new TextAnalyticsClient(new Uri(option.Host), new AzureKeyCredential(option.EndpointKey));
             });
 
             services.AddScoped(serviceProvider =>
@@ -69,6 +82,12 @@ namespace AwesomeBot
                             option.EndpointKey,
                             option.Host)));
             });
+
+            services.AddOptions<TranslationOption>().Configure<IConfiguration>((option, configuration) =>
+                configuration.GetSection("Translation").Bind(option));
+            
+            services.AddHttpClient<ITranslationClient, TranslationClient>();
+            services.AddScoped<ITranslationService, TranslationService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
